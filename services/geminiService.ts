@@ -3,7 +3,7 @@ import { GoogleGenAI } from "@google/genai";
 import { TradingSession } from "../types";
 
 export const getTradingInsight = async (session: Partial<TradingSession>): Promise<string> => {
-  const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+  const ai = new GoogleGenAI({ apiKey: process.env.GOOGLE_API_KEY });
   const prompt = `
     Analyze this trading session and provide a short (max 2 sentences) encouraging or critical insight.
     Market: ${session.market}

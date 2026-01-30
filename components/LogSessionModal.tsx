@@ -81,16 +81,23 @@ const LogSessionModal: React.FC<LogSessionModalProps> = ({ onClose, onSave, user
       isPublished: formData.isPublished,
     };
 
-    await getTradingInsight(newSession);
-    onSave(newSession);
-    setLoading(false);
-    onClose();
+    // نستخدم try/catch هنا لضمان أنه حتى لو فشل الـ AI، يتم حفظ الجلسة وإغلاق المودال
+    try {
+      // استدعاء البصيرة في الخلفية دون انتظارها لتعطيل المستخدم
+      getTradingInsight(newSession).catch(err => console.error("Background AI failed", err));
+      
+      onSave(newSession);
+      onClose();
+    } catch (err) {
+      console.error("Save error", err);
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/95 backdrop-blur-xl animate-in fade-in duration-300">
       <div className="bg-slate-900 w-full max-w-2xl rounded-[2.5rem] overflow-hidden border border-slate-800 shadow-[0_0_50px_rgba(0,0,0,0.5)] flex flex-col max-h-[95vh] animate-in zoom-in-95 duration-300">
-        {/* Header */}
         <div className="flex items-center justify-between p-8 border-b border-slate-800/50 bg-slate-900/50">
           <div className="flex items-center gap-4">
             <div className="bg-blue-600/20 p-3 rounded-2xl border border-blue-500/30">
@@ -107,8 +114,6 @@ const LogSessionModal: React.FC<LogSessionModalProps> = ({ onClose, onSave, user
         </div>
 
         <form onSubmit={handleSubmit} className="flex-1 overflow-y-auto p-8 space-y-10 scrollbar-hide">
-          
-          {/* Dashboard Header */}
           <div className={`p-8 rounded-3xl border transition-all duration-500 ${calculations.net >= 0 ? 'bg-emerald-500/5 border-emerald-500/20' : 'bg-rose-500/5 border-rose-500/20'}`}>
              <div className="flex items-center justify-between mb-6">
                 <span className="text-slate-500 text-[10px] font-black uppercase tracking-widest">Real-time P&L Tracker</span>
@@ -130,9 +135,7 @@ const LogSessionModal: React.FC<LogSessionModalProps> = ({ onClose, onSave, user
              </div>
           </div>
 
-          {/* Grid Sections */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-            {/* Market Column */}
             <div className="space-y-6">
               <div className="flex items-center gap-2 mb-2">
                 <Globe size={16} className="text-blue-400" />
@@ -159,7 +162,6 @@ const LogSessionModal: React.FC<LogSessionModalProps> = ({ onClose, onSave, user
               </div>
             </div>
 
-            {/* Side Selection */}
             <div className="space-y-6">
               <div className="flex items-center gap-2 mb-2">
                 <Target size={16} className="text-purple-400" />
@@ -184,7 +186,6 @@ const LogSessionModal: React.FC<LogSessionModalProps> = ({ onClose, onSave, user
             </div>
           </div>
 
-          {/* Pricing Grid */}
           <div className="space-y-6">
             <div className="flex items-center gap-2 mb-2">
               <DollarSign size={16} className="text-emerald-400" />
@@ -198,7 +199,6 @@ const LogSessionModal: React.FC<LogSessionModalProps> = ({ onClose, onSave, user
             </div>
           </div>
 
-          {/* Psychology */}
           <div className="space-y-6">
             <div className="flex items-center gap-2 mb-2">
               <Brain size={16} className="text-blue-400" />
@@ -213,7 +213,6 @@ const LogSessionModal: React.FC<LogSessionModalProps> = ({ onClose, onSave, user
           </div>
         </form>
 
-        {/* Footer */}
         <div className="p-8 border-t border-slate-800/50 bg-slate-900/80 backdrop-blur-md">
           <button
             onClick={handleSubmit}
